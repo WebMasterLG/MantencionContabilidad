@@ -1,0 +1,174 @@
+﻿@using System.Configuration;
+
+@{
+    var meses = new string[] { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+    var diasMeses = new int[] { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    var indiceMes = 1;
+    var mesSel = DateTime.Now.Month - 1;
+    var anoSel = DateTime.Now.Year;
+    if (mesSel == 0)
+    {
+        mesSel = 12;
+        anoSel -= 1;
+    }
+    if (anoSel % 4 == 0)
+    {
+        diasMeses[2] = 29;
+    }
+
+    var inicio = anoSel.ToString() + "-" + mesSel.ToString() + "-1";
+    var termino = anoSel.ToString() + "-" + mesSel.ToString() + "-" + diasMeses[mesSel];
+
+    int idUsuario = 10088;
+
+    string test = ConfigurationManager.AppSettings.Get("test");
+    if (test != "True" && (Request.Cookies["cookiePerfil"] == null || Request.Cookies["cookiePerfil"]["usuario"] == null)) 
+    {
+        idUsuario = 0;
+    };
+
+
+    if (test != "True")
+    {
+        idUsuario = int.Parse(Request.Cookies["cookiePerfil"]["usuario"].ToString());
+    }
+    }
+<div>
+    <div class="" align="center" style="text-align: center; margin-top: 10px;">
+
+        <div class="celda text-right color-corp" style="padding: 0;">Periodicidad: </div>
+        <div class="celda text-left " style="font-size: 14px;padding:0; padding-top: 2px;margin-left: 5px; ">
+            <input type="radio" name="periodicidadPago" id="periodicidadPago" checked value="mes" />&nbsp;Mensual
+            <input type="radio" name="periodicidadPago" id="periodicidadPago" value="periodo" style="margin-left: 5px;" />&nbsp;Rango fechas
+        </div>
+        <div class="celda text-left " id="filtroMesPago" style=" margin-left: 10px">
+
+            <select class="form-control-sm " id="selMesPago">
+                @foreach (var mes in meses)
+                {
+                    var selected = "";
+                    if (mesSel == indiceMes)
+                    {
+                        selected = "selected";
+                    }
+
+                    <option @selected value="@indiceMes">@mes</option>
+
+                    indiceMes += 1;
+                }
+            </select>
+            <select class="form-control-sm " id="selAnoPago">
+                @for (var ano = DateTime.Now.Year - 1; ano < DateTime.Now.Year + 2; ano++)
+                {
+                    var selected = "";
+                    if (ano == anoSel)
+                    {
+                        selected = "selected";
+                    }
+                    <option @selected value="@ano">@ano</option>
+                }
+
+            </select>
+        </div>
+        <div id="filtroRangoPago" class="celda collapse " style=" padding:0px; font-size: 14px; margin-left:10px;">
+            <span class="color-corp">Desde</span>
+            <input class="" type="date" id="desdePago" />&nbsp;&nbsp;
+            <span class="color-corp">Hasta</span>
+            <input class="" type="date" id="hastaPago" />
+        </div>
+        <div class="celda m-2">
+            <div id="" style="">
+                @Html.Action("_ListaProveedores")
+
+            </div>
+
+        </div>
+        <div id="" class="celda" style=" padding-left:0px; margin-left: 10px;">
+            <select class="form-control-sm" id="estadoPago">
+                <option selected value="99">Todos los estados</option>
+                <option value="0">Pendiente</option>
+                <option value="3">Solicitado</option>
+                <option value="1">Aprobado</option>
+                <option value="2">Rechazado</option>
+                <option value="9">Pagado</option>
+            </select>
+        </div>
+
+        <div class="celda" style=" padding-left:0px; margin-left: 10px;">
+            <select class="form-control-sm" id="tipoProv">
+                <option value="0" selected>Todos los proveedores</option>
+                @Html.Partial("_ListaComboBox", Contabilidad.Models.PagosModel.Llama_core_cargar_lista(idUsuario, 199, "C"))
+            </select>
+        </div>
+
+        <div class="celda" style=" margin-left:20px;">
+            <button onclick="buscarPago()" type="button" class="btn btn-corp CP-BG" style="color: #333;  padding: 5px 20px 5px 30px;" ">
+                <i class="fa fa-search" aria-hidden="true"></i>Buscar
+            </button>
+        </div>
+    </div>
+
+</div>
+<div id="GrillaPagos" class="mt-3">
+    @Html.Action("_GrillaPagos", new { inicio = inicio, termino = termino, idEstado = 99, idProveedor = 0 , tipo_proveedor = (idUsuario == 60329 ? 2: (idUsuario == 60320 ? 1 : 0)) })
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+    });
+
+    $('[name="periodicidadPago"]').on('change', function () {
+        //alert($(this).val())
+        if ($(this).val() === "mes") {
+            $('#filtroMesPago').css("display", "inline-block");
+            $('#filtroRangoPago').css("display", "none");
+        } else {
+            $('#filtroMesPago').css("display", "none");
+            $('#filtroRangoPago').css("display", "inline-block");
+        }
+    });
+
+    function buscarPago() {
+        var diasMeses = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (parseInt($("#selAnoPago").val()) % 4 == 0) diasMeses[2] = 29;
+
+        if ($("#periodicidadPago:checked").val() == "mes") {
+            inicio = $("#selAnoPago").val() + "-" + $("#selMesPago").val() + "-" + "1"
+            termino = $("#selAnoPago").val() + "-" + $("#selMesPago").val() + "-" + diasMeses[parseInt($("#selMesPago").val())]
+        } else {
+            inicio = $("#desdePago").val()
+            termino = $("#hastaPago").val()
+        }
+
+        estado = $("#estadoPago").val()
+        idProveedor = $("#SelProveedor").val()
+        //alert(inicio + " " + termino + " " + estado)
+        tipo_proveedor = $('#tipoProv').val()
+
+        var url = "@Url.Action("_GrillaPagos", "Pagos")";
+
+        var parametro = {
+            "inicio": inicio,
+            "termino": termino,
+            "idProveedor": idProveedor,
+            "idEstado": estado,
+            "tipo_proveedor": tipo_proveedor
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: parametro,
+            async: true,
+            success: function (data) {
+                $("#GrillaPagos").html(data);
+            }
+        });
+    };
+
+</script>

@@ -1,0 +1,7 @@
+﻿<select class="form-control-sm" id="SelProveedor" style="width: 200px;">
+    <option value="0">Todos los Proveedores</option>
+    @foreach (var prv in Model)
+    {
+        <option value="@prv.idProveedor">@prv.nombreProveedor</option>
+    }
+</select>

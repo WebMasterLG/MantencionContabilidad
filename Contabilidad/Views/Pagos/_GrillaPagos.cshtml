@@ -1,0 +1,539 @@
+﻿<div class=" mb-1" align="center" style=" margin-top: -20px;">
+    <div class="">
+        <button type="button" class="btn2 btn-info US-8" onclick="exportarListaPagos()" style="margin-right:0">
+            <i style="font-size:16px;" class="fas fa-file-invoice-dollar" data-toggle="tooltip" data-placement="top" title="Informes personalizado"></i>&nbsp;Informes
+        </button>
+    </div>
+
+</div>
+<div class="overflow-auto">
+    <table class="table table-striped shadow-sm mb-4 p-0" id="TablaPagos" style="font-size: 12px; ">
+        <thead>
+            <tr>
+                <th class="brl" title="Seleccionar todo" data-orderable="false"><input type="checkbox" name="selAllPago" id="selAllPago" onclick="seleccionarTodoPago()" /></th>
+
+                <th class="text-center">COT-OT @ViewBag.perfil</th>
+                <th class="text-center">Fecha</th>
+                <th class="">Fac.</th>
+                <th class="">Rut</th>
+                <th>Proveedor</th>
+                <th>Tipo Proveedor</th>
+                <th>Propiedad</th>
+                <th>Servicio</th>
+                <th>Para</th>
+                <th>Descripción trabajo</th>
+                <th class="text-right">Total</th>
+                <th>F. Estado</th>
+                <th>Estado</th>
+                <th scope="col" class="brr" data-orderable="false">Acc.</th>
+                <th hidden>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pago in Model)
+            {
+                <tr class="cursor">
+
+                    <td class="text-center">
+                        <input type="checkbox" idEstado="@pago.idEstado" estadoPago="@pago.estado" name="id_asignacion" id="id_asignacion" value="@pago.idAsignacion">
+                        <input type="hidden" name="id_factura" id="id_factura" value="@pago.idFactura">
+                    </td>
+                    <td class="text-center">
+                        @(pago.idAsignacion == 0?"S/Cot.":pago.idCotizacion.ToString() + "-" + pago.idAsignacion.ToString())
+                    </td>
+                    <td class="text-center">@pago.fechaTermino</td>
+                    <td class="text-center">@pago.numFactura</td>
+                    <td class="" style="white-space: nowrap;">@pago.rut</td>
+                    <td class="text-left" style="min-width: 100px">@pago.nomProveedor</td>
+                    <td class="text-left" style="min-width: 100px">@pago.tipo_proveedor</td>
+                    <td class="">@pago.propiedad</td>
+                    <td class="">@pago.servicio</td>
+                    <td class="" style="min-width: 200px">@pago.para</td>
+                    <td class="" style="min-width: 200px">@pago.descripcion</td>
+                    <td class="text-right">$@pago.total.ToString("N0")</td>
+                    <td class="">@pago.fecEstado</td>
+                    <td class="">@Html.Raw(pago.estado)</td>
+                    <td class="text-center">
+                        <a href="#" id="ObsSolicitud" onclick="obsSol(@pago.idAsignacion, '@pago.numFactura', '@pago.nomProveedor')"><i class="fab fa-font-awesome-flag USL-8 " data-toggle="tooltip" data-placement="top" title="Observaciones"></i></a>
+                        @{
+                            var rutaFacturaArch = "";
+                            if (pago.idAsignacion == 0)
+                            {
+                                rutaFacturaArch = ViewBag.urlSolicitudes + "Home/VerArchivo?nombreArchivo=" + pago.nomArchFactura + "&tipo=4&id=0";
+                            }
+                            else
+                            {
+                                rutaFacturaArch = ViewBag.urlSolicitudes + "Home/VerArchivo?nombreArchivo=" + pago.nomArchFactura + "&tipo=3&id=" + pago.idCotizacion;
+                            }
+                        }
+                        <a id="verArchivoFact" class="opcArchivoFact" style='padding-top:20px;@(string.IsNullOrEmpty(pago.nomArchFactura) ? "display: none;" : "")' href="@rutaFacturaArch" target="_blank">
+                            <i class="fas fa-file-pdf color-corp" style='cursor: pointer; font-size:18px;' data-toggle="tooltip" data-placement="left" title="Ver factura proveedor"></i>
+                        </a>
+                        @*<a onclick="RegistrarPago(@pago.idCotizacion, @pago.idAsignacion)" href="javascript:void(0)"><i class="fas fa-file-import USL-8" data-toggle="tooltip" data-placement="right" style="font-size: 16px;" data-original-title="Adjuntar factura del  Servicio" title="Adjuntar Factura Proveedor"></i></a>*@
+
+                        @*<i style='font-size: 16px; margin-left:5px;@(pago.idBanco == 0 ? "color: red":"color: green")' class="fas fa-landmark mt-2 CuentaDeposito" data-toggle="tooltip" data-placement="top" title="Cuenta para depósito" id_proveedor="@pago.idProveedor" rut_cta="@pago.rutCta" nombre_cta="@pago.nombreCta" id_banco="@pago.idBanco" id_tipo_cta="@pago.idTipoCta" numero_cta="@pago.numCta"></i>*@
+                    </td>
+                    <td hidden>@pago.total.ToString().Replace(".", ",")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot align="right" class="borde">
+            <tr>
+                <th colspan="11">SubTotal<br />Total General</th>
+                <th style="" nowrap></th>
+                <th colspan="3">&nbsp;</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+
+<div>
+    @using (Html.BeginForm("exportarExcel", "Facturacion", FormMethod.Post, new { id = "FormExcelPagos", name = "FormExcelPagos" }))
+    {
+        <input type="hidden" name="idFormato" id="idFormato" value="99" />
+        <input type="hidden" name="grilla" value="FACTURACION" />
+        <input type="hidden" name="inicio" id="inicio" />
+        <input type="hidden" name="termino" id="termino" />
+        <input type="hidden" name="fechaContable" id="fechaContable" />
+        <input type="hidden" name="id_estado_facturacion" id="id_estado_facturacion" />
+        <input type="hidden" name="ids_seleccion" id="ids_seleccion" />
+        <input type="hidden" name="id_proveedor" id="id_proveedor" />
+    }
+</div>
+
+
+
+<div class="" align="right">
+    <div id="btn_solicitar_pago" class='btn btn-corp celda cambioEstadoPago collapse '>Solicitar</div>
+    <div id="btn_aprobar_pago" class="btn btn-corp celda cambioEstadoPago collapse">Aprobar</div>
+    <div id="btn_rechazar_pago" class="btn btn-corp celda cambioEstadoPago collapse">Rechazar</div>
+    <div id="btn_transfer" class="celda collapse" style="border: 1px solid #ccc;padding:3px; background:#eee;">
+        <div class="celda">
+            <div id="btn_pagado" class="btn btn-corp celda cambioEstadoPago collapse">Pagado</div>
+        </div>
+        <div class="celda " style="text-align:left">
+            <span style="font-size:10px;">Fecha Nómina</span>
+            <input type="date" class="form-control" id="FechaNomina">
+        </div>
+    </div>
+</div>
+
+<div id="Modal_Excel_Pagos" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title USL-8" style="color:#666; padding: 5px;"><i class="fas fa-file-excel mr-2" style="font-size:20px;"></i>Exporta Archivo </h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="formatosExcelPagos" style="display: none"></table>
+                <div id="loadingExcelPagos" align="center"><i class="fa fa-spinner fa-spin "></i>Cargando....</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-corp" onclick="exportarExcelPagos()">Exportar</button>
+                <button type="button" class="btn btn-corp" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Banco Cuenta -->
+<div id="BancoCuenta" class="mt-3">
+    @Html.Action("_BancoCuenta")
+</div>
+
+<!-- Modal: agregar factura proveedor -->
+<div id="FacturaProveedor"></div>
+
+
+<!-- Modal: Observaciones Pago -->
+<div id="ObservacionesPago" class="mt-3">
+
+</div>
+
+<script>
+    var idsCambiar = "";
+
+    $('[id="id_asignacion"]').each(function () {
+
+        estadoActual = $(this).attr('estadoPago')
+
+        if (estadoActual == "Pendiente" && @((ViewBag.perfil == 1 || ViewBag.perfil == 22 || ViewBag.idUsuario == 40258 || ViewBag.idArea == 6) ? "true" : "false")) {
+            $('#btn_solicitar_pago').css('display','inline-block')
+        }
+		// 22: sugte de corretaje o 10: Gte de Finanzas
+        if (estadoActual == "Solicitado" && @((ViewBag.perfil == 22 || ViewBag.perfil == 10 || ViewBag.idArea == 8 || ViewBag.idUsuario == 10084) ? "true" : "false")) {
+            $("#btn_aprobar_pago").css("display", "inline-block")
+            $("#btn_rechazar_pago").css("display", "inline-block")
+        }
+
+        if (estadoActual == "Rechazado") $("#btn_aprobar_pago").css("display", "inline-block")
+        if (estadoActual == "Aprobado" && @((ViewBag.idArea == 8 || ViewBag.perfil == 1) ? "true" : "false")) {
+            $("#btn_pagado").css("display", "inline-block")
+            $("#btn_transfer").css("display", "inline-block")
+
+        }
+    });
+
+
+    function seleccionarTodoPago() {
+        if (!validaMismoEstadoPago("S")) {
+            $("#selAllPago").prop("checked", false);
+            return;
+        }
+
+        var checked = $("#selAllPago").prop("checked");
+        var api = $('#TablaPagos').dataTable().api();
+        api.column(0).nodes().to$().each(function (index) {
+            $(this).find('input:checkbox').prop('checked', checked);
+        });
+        api.draw();
+    }
+
+    function validaMismoEstadoPago(opcion) {
+        i = 0;
+        estadoCambiar = "";
+
+        $('[id="id_asignacion"]').each(function (index) {
+            i++
+            if ($(this).is(':checked') ) {
+                var estadoSel = $(this).attr('estadoPago')
+                if (estadoCambiar == "") {
+                    estadoCambiar = estadoSel;
+                }
+                //alert(estadoSel + "!=" +  estadoCambiar)
+
+                if (estadoSel != estadoCambiar) {
+                    estadoCambiar = "error";
+                    return false
+                }
+            }
+            if ($(this).is(':checked')) {
+                if ($(this).val() == 0) {
+                    idsCambiar += "F" + $($('[id="id_factura"]')[index]).val() + ";"
+                } else {
+                    idsCambiar += $(this).val() + ";"
+                }
+
+
+            }
+
+        });
+
+        if (estadoCambiar == "error") {
+            alert("Todas las facturas seleccionadas tienen que estar en el mismo estado");
+            return false;
+        }
+
+        return true;
+    }
+
+    $(".cambioEstadoPago").click(function () {
+        if (!validaMismoEstadoPago("S")) return false;
+
+        almenosUnoCheckeado = false
+        estadoActual = ""
+        idNuevoEstado = 0
+        $('[id="id_asignacion"]').each(function () {
+            if ($(this).is(':checked')) {
+                almenosUnoCheckeado = true
+                estadoActual = $(this).attr('estadoPago')
+            }
+        });
+
+        if (!almenosUnoCheckeado) {
+            alert("Debe seleccionar al menos un Pago para cambiar de estado");
+            return false;
+        }
+
+        if ($(this).attr("id") == "btn_solicitar_pago" && !estadoActual == "Pendiente" ) {
+            alert("Sólo puede cambiar a estado Solicitado pagos con estado Pendiente");
+            return false;
+        }
+        if ($(this).attr("id") == "btn_aprobar_pago" && !(estadoActual == "Solicitado" || estadoActual == "Rechazado")) {
+            alert("Sólo puede cambiar a estado Aprobado pagos con estado Solicitado o Rechazado");
+            return false;
+        }
+        //alert($(this).attr("id") + " " + estadoActual)
+        if ($(this).attr("id") == "btn_rechazar_pago" && !(estadoActual == "Solicitado" || estadoActual == "Aprobado")) {
+            alert("Sólo puede cambiar a estado Rechazado pagos con estado Solicitado o Aprobado");
+            return false;
+        }
+
+        if ($(this).attr("id") == "btn_pagado" && !(estadoActual == "Aprobado")) {
+            alert("Sólo puede cambiar a estado Pagado pagos con estado Aprobado");
+            return false;
+        }
+        if ($(this).attr("id") == "btn_pagado") idNuevoEstado = 9;
+        else
+            if ($(this).attr("id") == "btn_aprobar_pago") idNuevoEstado = 1
+            else
+                if ($(this).attr("id") == "btn_rechazar_pago") idNuevoEstado = 2
+                else
+                    if ($(this).attr("id") == "btn_solicitar_pago") idNuevoEstado = 3
+
+        if ($(this).attr("id") == "btn_pagado" && $("#FechaNomina").val() == "") {
+            alert("Para marcar como pagado debe ingresar campo Fecha Nómina.");
+            $("#FechaNomina").focus()
+            return false;
+        }
+        FechaNomina = $("#FechaNomina").val()
+        if (idNuevoEstado == 9)
+            FechaNomina = $("#FechaNomina").val()
+
+        var parametro = {
+            "IdsActualizar": idsCambiar,
+            "idNuevoEstado": idNuevoEstado,
+            "fechaNomina": FechaNomina
+        };
+        $.ajax({
+            data: parametro,
+            url: "@Url.Action("cambiarEstadoPago", "Pagos")",
+            type: "POST",
+            success: function (response) {
+                buscarPago();
+            }
+        });
+    });
+
+    $("#TablaPagos").DataTable({
+        "dom": 'Bl<"eleInline"i>frtp',
+        "buttons": [
+            {
+                extend: 'excelHtml5', className: 'btn2 btn-info',
+                text: 'Excel', //Puedes definir un diferente texto y hasta íconos ej: '<i class="fas fa-file-excel"></i> Ocultar Columnas'
+                exportOptions: {
+                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 12, 13]
+                }
+            },
+        ],
+
+        "order": [[2, "asc"]],
+        "pageLength": 25,
+        "lengthMenu": [[25, 50, 75, -1], [25, 50, 75, "All"]],
+
+        "filter": true,
+        "responsivePriority": 1,
+        "info": true,
+        "language": {
+            "lengthMenu": "Mostrar _MENU_ ",
+            "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "search": "",
+            "sLoadingRecords": "Cargando...",
+            "sProcessing": "Cargando...",
+            "emptyTable": "<b>Sin Pagos</b>",
+            "paginate": {
+                "previous": "Anterior",
+                "next": "Siguiente",
+
+            }
+        },
+        "footerCallback": function (row, data, start, end, display) {
+            var api = this.api(), data;
+
+            // converting to interger to find total
+            var intVal = function (i) {
+                var val = 0
+                if (i.toString().indexOf("<input") == -1) {
+                    if (typeof i === 'string') {
+                        val = i.replace(/[\.,]/g, '')
+                        val = val.replace(/[\$,]/g, '') * 1
+                    } else {
+                        if (typeof i === 'number') {
+                            val = i
+                        } else {
+                            val = 0
+                        }
+
+                    }
+                }
+                return val;
+            };
+
+            var monSubTotal = api
+                .column(11, { page: 'current' })
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            var monTotal = api
+                .column(11)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+            // Update footer by showing the total with the reference of the column index
+            //$(api.column(0).footer()).html('Total');
+            //debugger
+
+            //$(api.column(6).footer()).html('$ ' + formatNumber(monNeto));
+            //$(api.column(7).footer()).html('$ ' + formatNumber(monIVA));
+            $(api.column(11).footer()).html('$ ' + formatNumber(monSubTotal) + '<br/>$ ' + formatNumber(monTotal)+' ');
+
+        }
+    });
+
+    function exportarListaPagos() {
+        var todayDate = new Date().toISOString().slice(0, 10);
+
+        $("#Modal_Excel_Pagos").modal();
+        $.ajax({
+            url: "@Url.Action("FormatosExcel", "Facturacion")",
+            data: { grilla: "PAGOS" },
+            type: "get",
+            success: function (data) {
+                if (data.resp.length > 0) {
+                    $("#formatosExcelPagos tr").remove();
+                    data.resp.map(function (obj) {
+                        var fila = [];
+                        fila.push("<td><input type='radio' value='" + obj.id + "' name='radioFormatoExcelPagos' class='radioFormatoExcelPagos' /> </td>");
+
+                        if (obj.id == 3) { // si es interfaz contable solicita fecha contable
+                            fila.push("<td>&nbsp;&nbsp;" + obj.nombre + ": <span ><input class='' title='Fecha contable' style='width:150px;' type='date' id='fechaContableSel' value='" + todayDate + "' /></span></td>");
+                        } else {
+                            fila.push("<td>&nbsp;&nbsp;" + obj.nombre + "</td>");
+                        }
+
+                        $("#formatosExcelPagos").append("<tr>" + fila.join('') + "</tr>");
+                    });
+                }
+                $("#formatosExcelPagos").css("display","block")
+                $("#loadingExcelPagos").css("display","none")
+            },
+            error: function (xhr, status, error) {
+                alert("Error! " + xhr.status + " Descripcion: " + xhr.responseText);
+
+            }
+        });
+    }
+
+    function exportarExcelPagos() {
+        var sel = $(".radioFormatoExcelPagos:checked").val();
+        if (sel === undefined) {
+            alert("Debe seleccionar un Formato de Exportación")
+            return;
+        }
+
+        var diasMeses = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (parseInt($("#selAnoPago").val()) % 4 == 0) diasMeses[2] = 29;
+
+        if ($("#periodicidadPago:checked").val() == "mes") {
+            inicio = $("#selAnoPago").val() + "-" + $("#selMesPago").val() + "-" + "1"
+            termino = $("#selAnoPago").val() + "-" + $("#selMesPago").val() + "-" + diasMeses[parseInt($("#selMesPago").val())]
+        } else {
+            inicio = $("#desdePago").val()
+            termino = $("#hastaPago").val()
+        }
+
+        if (sel == "3" && $("#fechaContableSel").val() == "") {
+            alert("Debe seleccionar fecha contable")
+            return;
+        }
+        //debugger
+        estado = $("#estadoPago").val()
+
+        document.FormExcelPagos.idFormato.value = sel
+
+        document.FormExcelPagos.inicio.value = inicio
+        document.FormExcelPagos.termino.value = termino
+        document.FormExcelPagos.fechaContable.value = $("#fechaContableSel").val()
+        document.FormExcelPagos.id_estado_facturacion.value = estado
+        document.FormExcelPagos.id_proveedor.value = $("#SelProveedor").val()
+        //ids_seleccion
+
+        document.FormExcelPagos.submit();
+        $("#Modal_Excel_Pagos").modal('hide');
+    };
+
+
+    $(".ModificaProveedor").click(function () {
+        var linea = $(this).parent('tr');
+        $("#id_proveedor").val($(linea).attr("id_proveedor"));
+        $("#fp_prov").val($(linea).attr("id_forma_pago"));
+        rut_pasaporte = $(linea).attr("rut_pasaporte")
+
+
+        if (rut_pasaporte == 1) {
+            $("input[name='RutPasaporte'][value='0']").attr("checked", false).trigger('change')
+            $("input[name='RutPasaporte'][value='1']").attr("checked", true).trigger('change')
+            $("#pasaporte").val($(linea).attr("identificacion"));
+            $("#pasaporte").show()
+            $("#rut_prov").hide()
+        } else {
+            $("input[name='RutPasaporte'][value='1']").attr("checked", false).trigger('change')
+            $("input[name='RutPasaporte'][value='0']").attr("checked", true).trigger('change')
+
+            $("#rut_prov").val($(linea).attr("identificacion"));
+            $("#pasaporte").hide()
+            $("#rut_prov").show()
+        }
+
+        $("#nombre_prov").val($(linea).attr("nombre_proveedor"));
+        $("#fono_prov").val($(linea).attr("fono"));
+        $("#mail_prov").val($(linea).attr("mail"));
+        $("#sueldo_prov").val($(linea).attr("sueldo_bruto"));
+        $("#observacion_prov").val($(linea).attr("observacion"));
+
+        $(".GuardarProveedor").show();
+        $(".AgregarProveedor").hide();
+    });
+
+    $(".CuentaDeposito").click(function () {
+        $("#NombreCta").val($(this).attr("nombre_cta"))
+        $("#RutCta").val($(this).attr("rut_cta"))
+        $("#Banco").val($(this).attr("id_banco"))
+        $("#TipoCta").val($(this).attr("id_tipo_cta"))
+        $("#NumeroCta").val($(this).attr("numero_cta"))
+        $("#idProveedor").val($(this).attr("id_proveedor"))
+        //debugger
+
+        $("#ModalBancoCuenta").modal();
+    });
+
+
+    function RegistrarPago(pIdCotizacion, pIdAsignacion) {
+        var url = "@ViewBag.urlEnEjecucion" + "/home/_RegistrarPago";
+        var parametro = {
+            "idCotizacion": pIdCotizacion,
+            "idAsignacion": pIdAsignacion
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: parametro,
+            async: true,
+            success: function (data) {
+                $("#FacturaProveedor").html(data);
+                $("#ModalRegistrarPago").modal();
+            }
+        });
+    }
+
+
+    function obsSol(pIdAsig, pFactura, pNomProv) {
+        var url = "@Url.Action("_ObservacionesPago", "Pagos")";
+        var parametro = {
+            "idTipo": 1,        // 1: Observación de pago de factura
+            "idAsignacion": pIdAsig,
+            "numFactura": pFactura,
+            "nomProveedor": pNomProv
+        };
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: parametro,
+            success: function (data) {
+                $("#ObservacionesPago").html(data);
+                $("#ModalPagoObs").modal();
+            }
+        });
+
+    };
+
+</script>

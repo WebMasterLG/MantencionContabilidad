@@ -1,0 +1,284 @@
+/* Smartphones (portrait) */
+@media only screen 
+and (max-width : 420px) {
+  #Solicitudes a.btn.US-8.mr-4.mb-5 {
+    margin: 2rem 0 !important;
+  }
+  a#nav-nuevaCE-tab, a#nav-nuevaCI-tab, a#nav-nuevaCI-tab {
+    width: 100%;
+  }
+  table.table.table-striped.shadow-sm.mt-3.min{
+   display: table !important;
+    width: 100% !important;
+  }
+  .tooltip{
+    z-index: 1020 !important;
+  }
+  .datSol input, .datSol .input-group-append a{
+    margin-bottom: 1rem !important;
+  }
+  /* NAV */ 
+  nav#navPrincipal {
+    margin-top: 0;
+    padding: 1rem;
+    z-index: 500;
+  }
+  div#navEmpresa {
+    display: none;
+  }
+  .navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .nav-link.show, .navbar-dark .navbar-nav .show>.nav-link{
+    padding: 8px;
+  }
+  .nav-tabs a {
+    margin-right: auto;
+    margin-left: auto;
+  }
+  .nav-tabs .nav-link.active, .nav-tab .show>.nav-link {
+    border: 0;
+  }
+   ul.navbar-nav.mr-auto {
+    margin: 1rem 0;
+  }
+ a.nav-item {
+    width: 100%;
+  }
+  #MdlObs .col-md-6 {
+    width: 50%;
+  }
+  #Mdl-Dtll .col-md-11{
+    width: 80%;
+  }
+  #Mdl-Dtll .mt-4{
+    margin-top:0px !important;
+  }
+  #Mdl-Dtll .btn-app .fas, .btn-app .far {
+    line-height: 2.9em;
+  }
+  #Mdl-Dtll .card .card-header .btn {
+    padding: 11px 20px;
+  }
+  /* CARD */
+  .card-body{
+    padding: 15px 0;
+  }
+  .alert a.btn.btn-corp {
+    margin: 0.75rem;
+  }
+  .alert .form-group.col-md-4 {
+    text-align: center;
+  }
+  .card-body a span {
+    display: none;
+  }
+  #collapseArriendo a.btn.btn-corp.mb-4{
+    margin-top: 1rem;
+  }
+  .folio input {
+    width: 25%;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    margin-bottom: 1rem;
+  }
+  .folio p {
+    width: 100%;
+  }
+  /* MODAL */
+  h6.modal-title {
+    text-align: left;
+  }
+  .modal-body form.need-validation.m-5{
+    margin: 1rem !important;
+  }
+  .modal{
+    z-index: 9000;
+  }
+  .modal-body {
+    padding: 0.5rem;
+    font-size: 14px;
+  }
+  .modal-footer {
+    text-align: center;
+  }
+  /* BTN */
+  #collapseFiniquito form.text-left {
+    text-align: center !important;
+  }
+  #collapseFiniquito a.btn.btn-corp {
+    margin: 1rem;
+  }
+  .open .btn-app, .menu-toggle, .save i, .up i{
+    box-shadow: 0px 3px 6px 0rem rgba(0, 0, 0, 0.45);
+  }
+  a.btn.btn-corp.mr-4, a.btn.btn-corp.mr-5 {
+    margin-right: 0 !important;
+    margin-bottom: 1rem;
+  }
+  a.btn.m-5, a.btn.m-4 {
+    margin: 1rem !important;
+  }
+  a.btn-share.m-4 {
+    margin: 0.5rem !important;
+  }
+  /* TABLE */
+  #nav-renovar .form-check-inline.m-3, #FormPost .form-check-inline, .pagination .d-flex{
+    flex-direction: row;
+    padding: 0;
+  }
+  .page-link{
+    padding: 0.5rem 0.7rem;
+  }
+  .tab-content>.active {
+    margin-bottom: 2rem;
+  }
+  input[type="search"] {
+    margin: 1rem;
+  }
+  .dataTables_length.form-inline.mb-3 {
+    display: none;
+  }
+  .table{    
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+  .d-flex, .form-check-inline {
+    flex-direction: column;
+  }
+  .custom-control-inline {
+    margin-bottom: .75rem;
+  }
+  
+}
+/* Smartphones (landscape) */
+@media only screen 
+and (max-width : 321px) {
+}
+/* iPhone SE (landscape) */
+@media only screen 
+and (width : 640px) {
+  .tooltip{
+    z-index: 1020 !important;
+  }
+  .nav-tabs .nav-link.active, .nav-tab .show>.nav-link {
+    border: 0;
+  }
+   ul.navbar-nav.mr-auto {
+    margin: 1rem 0;
+  }
+  .navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .nav-link.show, .navbar-dark .navbar-nav .show>.nav-link{
+    padding: 8px;
+  }
+  nav#navPrincipal {
+    margin-top: 0;
+    padding: 1rem;
+    z-index: 500;
+  }
+  div#navEmpresa {
+    display: none;
+  }
+    /* CARD */
+  .card-body{
+    padding: 15px 0;
+  }
+  .alert a.btn.btn-corp {
+    margin: 0.75rem;
+  }
+  .table{    
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+  .card-body a span {
+    display: none;
+  }
+  .folio input {
+    width: 25%;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    margin-bottom: 1rem;
+  }
+  .folio p {
+    width: 100%;
+  }
+  a.btn.btn-corp.mr-4, a.btn.btn-corp.mr-5 {
+    margin-right: 0 !important;
+    margin-bottom: 1rem;
+  }
+  a.btn.m-5, a.btn.m-4 {
+    margin: 1rem !important;
+  }
+  a.btn-share.m-4 {
+    margin: 0.5rem !important;
+  }
+  .accordion.col-md-6, .alert.col-md-5, .alert.col-md-6 {
+    -ms-flex: 0 0 80%;
+    flex: 0 0 80%;
+    max-width: 80%;
+  }
+  table.table.table-striped.shadow-sm.mt-3.min{
+   display: table !important;
+    width: 100% !important;
+  }
+}
+/* iPads (portrait & landscape) */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px) {
+  .tooltip{
+    z-index: 1020 !important;
+  }
+  .nav-tabs .nav-link.active, .nav-tab .show>.nav-link {
+    border: 0;
+  }
+   ul.navbar-nav.mr-auto {
+    margin: 1rem 0;
+  }
+  .navbar-dark .navbar-nav .active>.nav-link, .navbar-dark .navbar-nav .nav-link.active, .navbar-dark .navbar-nav .nav-link.show, .navbar-dark .navbar-nav .show>.nav-link{
+    padding: 8px;
+  }
+  .table{    
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+  #nav-Garantia form{
+    margin-top: 1.5rem;
+  }
+  .folio input {
+    width: 20%;
+    margin-right: auto !important;
+    margin-left: auto !important;
+    margin-bottom: 1rem;
+  }
+  .accordion.col-md-6, .alert.col-md-5, .alert.col-md-6{
+    -ms-flex: 0 0 80%;
+    flex: 0 0 80%;
+    max-width: 80%;
+  }
+  a.btn.btn-corp.mr-4, a.btn.btn-corp.mr-5 {
+    margin-right: 0 !important;
+    margin-bottom: 1rem;
+  }
+  a.btn.m-5, a.btn.m-4 {
+    margin: 1rem !important;
+  }
+  a.btn-share.m-4 {
+    margin: 0.5rem !important;
+  }
+  footer.mt-5{
+    margin-top: 7rem !important;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+  }
+  table.table.table-striped.shadow-sm.mt-3.min{
+   display: table !important;
+    width: 100% !important;
+  }
+}
