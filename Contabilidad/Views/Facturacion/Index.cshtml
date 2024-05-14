@@ -1,0 +1,148 @@
+﻿@{
+    var meses = new string[] { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+    var diasMeses = new int[] { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    var indiceMes = 1;
+    var mesSel = DateTime.Now.Month - 1;
+    var anoSel = DateTime.Now.Year;
+    if (mesSel == 0)
+    {
+        mesSel = 12;
+        anoSel -= 1;
+    }
+    if (anoSel % 4 == 0)
+    {
+        diasMeses[2] = 29;
+    }
+
+    var inicio = anoSel.ToString() + "-" + mesSel.ToString() + "-1";
+    var termino = anoSel.ToString() + "-" + mesSel.ToString() + "-" + diasMeses[mesSel];
+
+
+}
+<div>
+    <div class="" align="center" style="text-align: center; margin-top: 10px;">
+
+        <div class="celda text-right color-corp" style="padding: 0;">Periodicidad: </div>
+        <div class="celda text-left " style="font-size: 14px;padding:0; padding-top: 2px;margin-left: 5px; ">
+            <input type="radio" name="periodicidad" id="periodicidad" checked value="mes" />&nbsp;Mensual
+            <input type="radio" name="periodicidad" id="periodicidad" value="periodo" style="margin-left: 5px;" />&nbsp;Rango fechas
+        </div>
+        <div class="celda text-left " id="filtroMes" style=" margin-left: 10px">
+
+            <select class="form-control-sm " id="selMes">
+                @foreach (var mes in meses)
+                {
+                    var selected = "";
+                    if (mesSel == indiceMes)
+                    {
+                        selected = "selected";
+                    }
+
+                    <option @selected value="@indiceMes">@mes</option>
+
+                    indiceMes += 1;
+                }
+            </select>
+            <select class="form-control-sm " id="selAno">
+                @for (var ano = DateTime.Now.Year - 1; ano < DateTime.Now.Year + 2; ano++)
+                {
+                    var selected = "";
+                    if (ano == anoSel)
+                    {
+                        selected = "selected";
+                    }
+                    <option @selected value="@ano">@ano</option>
+                }
+
+            </select>
+        </div>
+        <div id="filtroRango" class="celda collapse " style=" padding:0px; font-size: 14px; margin-left:10px;">
+            <span class="color-corp">Desde</span>
+            <input class="" type="date" id="desde" />&nbsp;&nbsp;
+            <span class="color-corp">Hasta</span>
+            <input class="" type="date" id="hasta" />
+        </div>
+        <div id="" class="celda  " style=" padding-left:0px; margin-left: 50px;">
+            <select class="form-control-sm" id="estado">
+                <option selected value="99">Todos los estados</option>
+                <option value="0">Pendiente</option>
+                @*<option value="1">Aprobada</option>
+                    <option value="2">Rechazada</option>*@
+                <option value="9">Facturada</option>
+            </select>
+        </div>
+
+
+        <div class="celda" style=" margin-left:20px;">
+            <button onclick="buscar()" type="button" class="btn btn-corp CP-BG" style="color: #333;  padding: 5px 20px 5px 30px;">
+                <i class="fa fa-search" aria-hidden="true"></i>Buscar
+            </button>
+        </div>
+    </div>
+
+</div>
+<div id="GrillaFacturacion" class="mt-3">
+    @Html.Action("_GrillaFacturacion", new { inicio = inicio, termino = termino, idEstado = 99 })
+</div>
+
+
+<!-- Modal cargando-->
+<div class="modal" id="mdlCargando" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="buttonload text-primary" style="margin: 0 auto;">
+                <i class="fa fa-spinner fa-spin "></i>Cargando...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('[name="periodicidad"]').on('change', function () {
+        //alert($(this).val())
+        if ($(this).val() === "mes") {
+            $('#filtroMes').css("display", "inline-block");
+            $('#filtroRango').css("display", "none");
+        } else {
+            $('#filtroMes').css("display", "none");
+            $('#filtroRango').css("display", "inline-block");
+        }
+    });
+
+    function buscar() {
+        $("#mdlCargando").modal();
+        var diasMeses = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (parseInt($("#selAno").val()) % 4 == 0) diasMeses[2] = 29;
+
+        if ($("#periodicidad:checked").val() == "mes") {
+            inicio = $("#selAno").val() + "-" + $("#selMes").val() + "-" + "1"
+            termino = $("#selAno").val() + "-" + $("#selMes").val() + "-" + diasMeses[parseInt($("#selMes").val())]
+        } else {
+            inicio = $("#desde").val()
+            termino = $("#hasta").val()
+        }
+
+        estado = $("#estado").val()
+        //alert(inicio + " " + termino + " " + estado)
+
+
+        var url = "@Url.Action("_GrillaFacturacion", "Facturacion")";
+
+        var parametro = {
+            "inicio": inicio,
+            "termino": termino,
+            "idEstado": estado
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: parametro,
+            async: true,
+            success: function (data) {
+                $("#GrillaFacturacion").html(data);
+                $("#mdlCargando").modal('hide');
+            }
+        });
+    };
+
+</script>

@@ -1,0 +1,212 @@
+﻿<div class="modal fade" id="ModalBancoCuenta" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable " role="document">
+        <div class="modal-content ">
+            <div class="modal-header US-8">
+
+                <h6 class="modal-title"><i class="fas fa-landmark mr-2"></i>Cuenta de Depósito</h6>
+                <button type="button" class="close" data-dismiss="modal" style="color:#fff;">&times;</button>
+
+            </div>
+            <div class="modal-body text-left scrollbar ">
+                <div class="row m-4">
+                    <input type="text" class="form-control" id="RutCta" placeholder="Rut Cuenta" onblur="formato_rut(this)" />
+                </div>
+                <div class="row m-4">
+                    <input type="text" class="form-control" id="NombreCta" placeholder="Nombre" />
+                </div>
+                <div class="row m-4" id="divBanco"></div>
+                <div class="row m-4" id="divTipoCuenta"></div>
+                <div class="row m-4">
+                    <input type="text" class="form-control" id="NumeroCta" placeholder="Número de Cuenta" />
+                </div>
+                <div id="msjErrorBcoCta" class="alert alert-danger collapse" role="alert">
+                    This is a danger alert—check it out!
+                </div>
+                <div class="mx-auto text-center">
+                    <input type="hidden" id="idProveedor" />
+                    <a href="javascript:void(0)" class="btn btn-corp US-8 m-2" data-dismiss="modal" arial-label="close">cancelar</a>
+                    <a href="javascript:void(0)" class="btn btn-corp m-2 GuardarBcoCta"><i class="fas fa-save mr-2"></i>Guardar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+        CargaListaBanco()
+        CargaListaTipoCuenta()
+    });
+
+    function CargaListaBanco() {
+        var url = "@ViewBag.urlCotizaciones" + "/home/_CargaListaGeneral";
+        var parametro = {
+            "idTabla": 25,
+            "idKey": "c_item",
+            "orden": "G",
+            "textoOpcionCero": "Banco",
+            "nomInput": "Banco"
+        };
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: parametro,
+            async: true,
+            success: function (data) {
+                $("#divBanco").html(data);
+            }
+        });
+    }
+
+    function CargaListaTipoCuenta() {
+        var url = "@ViewBag.urlCotizaciones" + "/home/_CargaListaGeneral";
+        var parametro = {
+            "idTabla": 68,
+            "idKey": "c_item",
+            "orden": "G",
+            "textoOpcionCero": "Tipo de cuenta",
+            "nomInput": "TipoCta"
+        };
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: parametro,
+            async: true,
+            success: function (data) {
+                $("#divTipoCuenta").html(data);
+            }
+        });
+    }
+
+    $(".GuardarBcoCta").click(function () {
+        $("#msjErrorBcoCta").hide()
+        if ($("#RutCta").val() == "") {
+            $("#msjErrorBcoCta").html("Debe ingresar el rut de la cuenta").show()
+            $("#RutCta").focus();
+            return false;
+        }
+        if ($("#NombreCta").val() == "") {
+            $("#msjErrorBcoCta").html("Debe ingresar el nombre de la cuenta").show()
+            $("#NombreCta").focus();
+            return false;
+        }
+        if ($("#Banco").val() == "0") {
+            $("#msjErrorBcoCta").html("Debe seleccionar banco").show()
+            $("#Banco").focus();
+            return false;
+        }
+        if ($("#TipoCta").val() == "0") {
+            $("#msjErrorBcoCta").html("Debe seleccionar el tipo de cuenta").show()
+            $("#TipoCta").focus();
+            return false;
+        }
+        if ($("#NumeroCta").val() == "") {
+            $("#msjErrorBcoCta").html("Debe ingresar el número de la cuenta").show()
+            $("#NumeroCta").focus();
+            return false;
+        }
+
+        var param = {
+            "idProveedor": $("#idProveedor").val()
+            , "rutCta": $("#RutCta").val()
+            , "nomCta": $("#NombreCta").val()
+            , "idBanco": $("#Banco").val()
+            , "idTipoCta": $("#TipoCta").val()
+            , "numeroCta": $("#NumeroCta").val()
+        };
+        var url = "@ViewBag.urlMantenedores" + "/Proveedores/GuardarCtaDeposito";
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: param,
+            async: false,
+            success: function (Ok) {
+                if (Ok) {
+                    alert("Cuenta guardarda")
+                    $("#ModalBancoCuenta").modal('hide');
+                    $('.modal-backdrop').hide();
+                    buscarPago();
+
+
+                } else {
+                    alert("Error al guardar cuenta");
+                }
+            }
+        });
+
+    });
+
+    function formato_rut(rut) {
+        $("#msjErrorBcoCta").html("");
+        $("#msjErrorBcoCta").fadeOut();
+        var rut_aux = rut.value
+
+        var rut_aux = rut_aux.replace(/\./g, "");
+        rut_aux = rut_aux.replace(/-/g, "");
+        rut.value = rut_aux
+
+        var sRut1 = rut.value;      //contador de para saber cuando /img/ar el . o la -
+        var nPos = 0;               //Guarda el rut invertido con los puntos y el guión agregado
+        var sInvertido = "";        //Guarda el resultado final del rut como debe ser
+        var sRut = "";
+        for (var i = sRut1.length - 1; i >= 0; i--) {
+            sInvertido += sRut1.charAt(i);
+            if (i == sRut1.length - 1)
+                sInvertido += "-";
+            else if (nPos == 3) {
+                sInvertido += ".";
+                nPos = 0;
+            }
+            nPos++;
+        }
+        for (var j = sInvertido.length - 1; j >= 0; j--) {
+            if (sInvertido.charAt(sInvertido.length - 1) != ".")
+                sRut += sInvertido.charAt(j);
+            else if (j != sInvertido.length - 1)
+                sRut += sInvertido.charAt(j);
+        }
+        //Pasamos al campo el valor formateado
+        rut.value = sRut.toUpperCase();
+        if (!valida_rut(rut.value)) {
+            $("#msjErrorBcoCta").html("Rut ingresado no válido.");
+            $("#msjErrorBcoCta").fadeIn();
+            $("#RutCta").focus();
+        }
+    }
+
+    function valida_rut(rut) {
+        var rut_aux = rut.replace(/\./g, "");
+        rut_aux = rut_aux.replace(/-/g, "");
+        rut = rut_aux
+        //Valor acumulado para el calculo de la formula
+        var nAcumula = 0;
+        //Factor por el cual se debe multiplicar el valor de la posicion
+        var nFactor = 2;
+        //Dígito verificador
+        var nDv = 0;
+        //extraemos el ultimo numero o letra que corresponde al verificador
+        //La K corresponde a 10
+        if (rut.charAt(rut.length - 1).toUpperCase() == 'K')
+            nDvReal = 10;
+        //el 0 corresponde a 11
+        else if (rut.charAt(rut.length - 1) == 0)
+            nDvReal = 11;
+        else
+            nDvReal = rut.charAt(rut.length - 1);
+
+        for (nPos = rut.length - 2; nPos >= 0; nPos--) {
+            nAcumula += rut.charAt(nPos).valueOf() * nFactor;
+            nFactor++;
+            if (nFactor > 7) nFactor = 2;
+        }
+
+
+        nDv = 11 - (nAcumula % 11)
+        if (nDv == nDvReal)
+            return true;
+        return false;
+    }
+
+</script>
